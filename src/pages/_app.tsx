@@ -1,13 +1,17 @@
 import 'ress'
+import { ChakraProvider } from '@chakra-ui/react'
 import { css, Global } from '@emotion/react'
 import type { AppProps } from 'next/app'
+import { AuthProvider } from '@/context/AuthContext'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <>
-      <Global styles={globalStyle} />
-      <Component {...pageProps} />
-    </>
+    <ChakraProvider>
+      <AuthProvider>
+        <Global styles={globalStyle} />
+        <Component {...pageProps} />
+      </AuthProvider>
+    </ChakraProvider>
   )
 }
 
