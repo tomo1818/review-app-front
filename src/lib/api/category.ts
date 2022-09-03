@@ -1,9 +1,14 @@
 import client from './client'
 import { CategoryParams } from '@/types/category'
 
-// カテゴリー取得
+// グループに所得しているカテゴリー一覧を取得
 export const getCategories = (groupId: number) => {
   return client.get(`/categories/${groupId}`)
+}
+
+// カテゴリーを取得
+export const getCategory = (id: number) => {
+  return client.get(`categories/${id}/get_category`)
 }
 
 // 新規作成
