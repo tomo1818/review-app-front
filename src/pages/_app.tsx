@@ -2,15 +2,20 @@ import 'ress'
 import { ChakraProvider } from '@chakra-ui/react'
 import { css, Global } from '@emotion/react'
 import type { AppProps } from 'next/app'
+import { RecoilRoot } from 'recoil'
+import { Header } from '@/components/layout/Header'
 import { AuthProvider } from '@/context/AuthContext'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider>
-      <AuthProvider>
-        <Global styles={globalStyle} />
-        <Component {...pageProps} />
-      </AuthProvider>
+      <RecoilRoot>
+        <AuthProvider>
+          <Global styles={globalStyle} />
+          <Header />
+          <Component {...pageProps} />
+        </AuthProvider>
+      </RecoilRoot>
     </ChakraProvider>
   )
 }
@@ -33,13 +38,18 @@ const globalStyle = css`
   }
 
   a {
-    color: var(--color-secondary);
+    /* color: var(--color-secondary); */
+    color: rgb(0 0 0 / 92%);
+    transition: all 0.2s;
 
     &:hover,
     &:focus,
     &:active {
-      color: var(--color-accent);
-      text-decoration: underline;
+      opacity: 0.9;
+
+      /* color: var(--color-accent); */
+      text-decoration: none !important;
+      transition: all 0.2s;
     }
   }
 `

@@ -1,8 +1,8 @@
-import { Heading } from '@chakra-ui/react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { AuthContext } from '@/context/AuthContext'
+import { LayoutCategories } from '@/layouts/categories/LayoutCategories'
 import { getCategories } from '@/lib/api/category'
 import { Category } from '@/types/category'
 
@@ -12,30 +12,26 @@ const CategoryPage: NextPage = () => {
   const router = useRouter()
   const id = router.query.id
 
-  console.log(id)
+  const handleGetCategories = useCallback(async () => {
+    const categoriesRes = await getCategories(Number(id))
+    setCategories(categoriesRes.data)
+  }, [id])
 
   useEffect(() => {
-    const handleGetCategories = async () => {
-      if (!loading) {
-        if (currentUser) {
-          const categoriesRes = await getCategories(Number(id))
-          setCategories(categoriesRes.data)
-          console.log(categoriesRes.data)
-        } else {
-          router.push('/signin')
-        }
+    if (!loading && router.isReady) {
+      if (currentUser) {
+        handleGetCategories()
+      } else {
+        router.push('/signin')
       }
     }
-
-    handleGetCategories()
-  }, [currentUser, id, loading, router])
+  }, [currentUser, handleGetCategories, loading, router])
   return (
-    <>
-      <Heading>カテゴリーページ</Heading>
-      {categories.map((item, index) => (
-        <p key={index}>{item.name}</p>
-      ))}
-    </>
+    <LayoutCategories
+      categories={categories}
+      groupId={Number(id)}
+      setCategories={setCategories}
+    />
   )
 }
 

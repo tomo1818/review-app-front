@@ -1,30 +1,33 @@
-import { Heading } from '@chakra-ui/react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useContext, useEffect } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { AuthContext } from '@/context/AuthContext'
+import { LayoutGroups } from '@/layouts/group/LayoutGroups'
 import { getUserGroup } from '@/lib/api/user'
+import { Group } from '@/types/group'
 
 const Group: NextPage = () => {
   const { loading, currentUser } = useContext(AuthContext)
   const router = useRouter()
+  const [groups, setGroups] = useState<Group[]>([])
+
+  const handleGetUserGroup = useCallback(async () => {
+    if (currentUser) {
+      const res = await getUserGroup(currentUser.id)
+      console.log(res.data)
+      setGroups(res.data)
+    } else {
+      router.push('/signin')
+    }
+  }, [currentUser, router])
 
   useEffect(() => {
-    const handleGetUserGroup = async () => {
-      if (!loading) {
-        if (currentUser) {
-          const res = await getUserGroup(currentUser.id)
-          console.log(res.data)
-        } else {
-          router.push('/signin')
-        }
-      }
+    if (!loading) {
+      handleGetUserGroup()
     }
+  }, [loading])
 
-    handleGetUserGroup()
-  }, [currentUser, loading, router])
-
-  return <Heading>グループページ</Heading>
+  return <LayoutGroups groups={groups} setGroups={setGroups} />
 }
 
 export default Group
