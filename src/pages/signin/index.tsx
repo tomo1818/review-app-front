@@ -36,7 +36,7 @@ const SignIn: NextPage = () => {
         setIsSignedIn(true)
         setCurrentUser(res.data.data)
 
-        router.push('/group')
+        router.push('/')
       }
     } catch (e) {
       console.log(e)

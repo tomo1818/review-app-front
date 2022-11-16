@@ -4,7 +4,7 @@ import { User } from '@/types/user'
 
 interface IAuthContext {
   currentUser: User | null | undefined
-  setCurrentUser: (value: User) => void
+  setCurrentUser: (value: User | undefined | null) => void
   isSignedIn: boolean
   setIsSignedIn: (value: boolean) => void
   loading: boolean

@@ -28,8 +28,9 @@ import { signOut } from '@/lib/api/auth'
 
 export const Header: React.FC = () => {
   const { isOpen, onToggle } = useDisclosure()
-  const { isSignedIn, setIsSignedIn } = useContext(AuthContext)
+  const { isSignedIn, setIsSignedIn, setCurrentUser } = useContext(AuthContext)
   const handleSignOut = () => {
+    setCurrentUser(undefined)
     setIsSignedIn(false)
     signOut()
   }
