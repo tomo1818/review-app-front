@@ -1,5 +1,6 @@
 import { Box, Heading, Container, Text, Button, Stack } from '@chakra-ui/react'
 import type { NextPage } from 'next'
+import Link from 'next/link'
 
 const Home: NextPage = () => {
   return (
@@ -40,9 +41,11 @@ const Home: NextPage = () => {
           >
             利用を開始する
           </Button>
-          <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
-            ログインはこちら
-          </Button>
+          <Link href="/signin">
+            <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
+              ログインはこちら
+            </Button>
+          </Link>
         </Stack>
       </Stack>
     </Container>

@@ -1,10 +1,14 @@
-export type groupParams = {
+import { User } from './user'
+
+export type GroupParams = {
   name: string
 }
 
 export type Group = {
   id: number
   name: string
-  created_at: Date
-  updated_at: Date
+  ownerId: number
+  users: User[]
+  createdAt: Date
+  updatedAt: Date
 }

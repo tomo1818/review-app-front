@@ -1,22 +1,31 @@
+import { AxiosPromise } from 'axios'
 import client from './client'
-import { CategoryParams } from '@/types/category'
+import { Category } from '@/types/category'
 
-// カテゴリー取得
-export const getCategories = (groupId: number) => {
+// グループに所得しているカテゴリー一覧を取得
+export const getCategories = (groupId: number): AxiosPromise<Category[]> => {
   return client.get(`/categories/${groupId}`)
 }
 
+// カテゴリーを取得
+export const getCategory = (id: number) => {
+  return client.get(`/categories/${id}/get_category`)
+}
+
 // 新規作成
-export const createCategory = (params: CategoryParams) => {
+export const createCategory = (params: FormData): AxiosPromise<Category> => {
   return client.post(`/categories`, params)
 }
 
 // 更新
-export const updateCategory = (categoryId: number, params: CategoryParams) => {
+export const updateCategory = (
+  categoryId: number,
+  params: FormData,
+): AxiosPromise<Category> => {
   return client.patch(`/categories/${categoryId}`, params)
 }
 
 // 削除
-export const deleteGroup = (categoryId: number) => {
+export const deleteCategory = (categoryId: number) => {
   return client.delete(`/categories/${categoryId}`)
 }
