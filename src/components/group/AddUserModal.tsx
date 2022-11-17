@@ -23,6 +23,7 @@ import { css } from '@emotion/react'
 import { useRef, useState } from 'react'
 import { Spacer } from '../utils/Spacer'
 import { ConfirmDialog } from './ConfirmDialog'
+import { useDevice } from '@/hooks/use-device'
 import { getUsers } from '@/lib/api/user'
 import { Group } from '@/types/group'
 import { User } from '@/types/user'
@@ -56,6 +57,7 @@ export const AddUserModal: React.FC<Props> = ({
     onClose: onDeleteModalClose,
   } = useDisclosure()
   const cancelRef = useRef<HTMLButtonElement>(null)
+  const { isMobile } = useDevice()
 
   const searchUserByName = async () => {
     try {
@@ -98,7 +100,6 @@ export const AddUserModal: React.FC<Props> = ({
                     />
                     <IconButton
                       aria-label="search user"
-                      size="md"
                       icon={<SearchIcon />}
                       onClick={() => searchUserByName()}
                       disabled={userName.length === 0}
@@ -106,7 +107,7 @@ export const AddUserModal: React.FC<Props> = ({
                   </Box>
                   {users && (
                     <>
-                      <Spacer size={20} />
+                      <Spacer size={isMobile ? 10 : 20} />
                       {users.length > 0 ? (
                         <Box
                           borderWidth="1px"
@@ -138,7 +139,7 @@ export const AddUserModal: React.FC<Props> = ({
                     </>
                   )}
 
-                  <Spacer size={20} />
+                  <Spacer size={isMobile ? 10 : 20} />
                   <div css={tagWrapper}>
                     {group.users.map((user, index) => (
                       <Tag key={index} paddingRight={0}>

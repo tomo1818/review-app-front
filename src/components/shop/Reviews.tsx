@@ -4,22 +4,26 @@ import { useState } from 'react'
 import { Spacer } from '../utils/Spacer'
 import { FormModal } from './ReviewModal'
 import { ReviewView } from './ReviewView'
+import { useDevice } from '@/hooks/use-device'
 import { createReview } from '@/lib/api/review'
 import { Review } from '@/types/review'
+import { Shop } from '@/types/shop'
 
 type Props = {
+  shop: Shop
   reviews: Review[]
-  setReviews: (value: Review[]) => void
+  setReviews: (value: Review) => void
 }
 
-export const Reviews: React.FC<Props> = ({ reviews, setReviews }) => {
+export const Reviews: React.FC<Props> = ({ shop, reviews, setReviews }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [params, setParams] = useState({
-    shopId: 1,
+    shopId: shop.id,
     title: '',
     comment: '',
     score: 0,
   })
+  const { isMobile } = useDevice()
 
   const handleChange = (name: string, val: string | number) => {
     setParams({
@@ -31,7 +35,7 @@ export const Reviews: React.FC<Props> = ({ reviews, setReviews }) => {
   const handleSubmit = async () => {
     try {
       const res = await createReview(params)
-      setReviews([...reviews, res.data])
+      setReviews(res.data)
     } catch (e) {
       console.log(e)
     }
@@ -39,17 +43,22 @@ export const Reviews: React.FC<Props> = ({ reviews, setReviews }) => {
 
   return (
     <>
-      <Heading size="md" color="blackAlba/900">
+      <Heading size={isMobile ? 'sm' : 'md'} color="blackAlba/900">
         レビュー
       </Heading>
-      <Spacer size={20} />
+      <Spacer size={isMobile ? 10 : 20} />
       <div css={reviewsWrapper}>
         {reviews.map((review, index) => (
           <ReviewView review={review} key={index} />
         ))}
       </div>
-      <Spacer size={20} />
-      <Button variant="solid" colorScheme="teal" onClick={onOpen}>
+      <Spacer size={isMobile ? 10 : 20} />
+      <Button
+        size={isMobile ? 'sm' : 'md'}
+        variant="solid"
+        colorScheme="teal"
+        onClick={onOpen}
+      >
         レビューを追加する
       </Button>
 

@@ -2,6 +2,7 @@ import { AxiosPromise } from 'axios'
 import Cookies from 'js-cookie'
 import client from './client'
 import { HeadersItem } from '@/types/auth'
+import { Group } from '@/types/group'
 import { User } from '@/types/user'
 
 export const getUsers = (
@@ -13,7 +14,7 @@ export const getUsers = (
   return client.get(`/users`)
 }
 
-export const getUserGroup = (id: number) => {
+export const getUserGroup = (id: number): AxiosPromise<Group[]> => {
   return client.get(`/users/${id}`, {
     headers: {
       'access-token': Cookies.get('_access_token') as HeadersItem,

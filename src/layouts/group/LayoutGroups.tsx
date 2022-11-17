@@ -9,13 +9,15 @@ import { Spacer } from '@/components/utils/Spacer'
 import { useDevice } from '@/hooks/use-device'
 import { createGroup, deleteGroup, updateGroup } from '@/lib/api/group'
 import { Group, GroupParams } from '@/types/group'
+import { User } from '@/types/user'
 
 type Props = {
+  user: User
   groups: Group[]
   setGroups: (value: Group[]) => void
 }
 
-export const LayoutGroups: React.FC<Props> = ({ groups, setGroups }) => {
+export const LayoutGroups: React.FC<Props> = ({ groups, setGroups, user }) => {
   const { isMobile } = useDevice()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [editGroupId, setIsEditGroupId] = useState(0)
@@ -92,18 +94,24 @@ export const LayoutGroups: React.FC<Props> = ({ groups, setGroups }) => {
       <div css={headingWrapper}>
         <Heading size={isMobile ? 'xl' : '2xl'}>グループ一覧</Heading>
         <div css={buttonWrapper}>
-          <Button variant="solid" colorScheme="teal" onClick={onOpen}>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            variant="solid"
+            colorScheme="teal"
+            onClick={onOpen}
+          >
             追加する
           </Button>
         </div>
       </div>
-      <Spacer size={40} />
+      <Spacer size={isMobile ? 20 : 40} />
 
       <GroupsView
         groups={groups}
         setGroups={setGroups}
         handleDelete={handleDelete}
         onOpen={handleOpen}
+        user={user}
       />
 
       <GroupModal

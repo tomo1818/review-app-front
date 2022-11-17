@@ -2,7 +2,7 @@ import {
   HamburgerIcon,
   CloseIcon,
   ChevronDownIcon,
-  ChevronRightIcon,
+  // ChevronRightIcon,
 } from '@chakra-ui/icons'
 import {
   Box,
@@ -14,26 +14,38 @@ import {
   Collapse,
   Icon,
   Link,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
+  // Popover,
+  // PopoverTrigger,
+  // PopoverContent,
   useColorModeValue,
   useBreakpointValue,
   useDisclosure,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
-import React, { useContext } from 'react'
-import { AuthContext } from '@/context/AuthContext'
+import React, { useCallback, useEffect } from 'react'
+import { useRecoilState } from 'recoil'
+import { useDevice } from '@/hooks/use-device'
 import { signOut } from '@/lib/api/auth'
+import { userValueSelector } from '@/store/user-store'
+import { User } from '@/types/user'
 
 export const Header: React.FC = () => {
   const { isOpen, onToggle } = useDisclosure()
-  const { isSignedIn, setIsSignedIn, setCurrentUser } = useContext(AuthContext)
-  const handleSignOut = () => {
-    setCurrentUser(undefined)
-    setIsSignedIn(false)
+  const [user, setUser] = useRecoilState(userValueSelector)
+  const { isMobile } = useDevice()
+  const handleSignOut = useCallback(() => {
+    setUser(null)
     signOut()
+  }, [setUser])
+  const mobileNav = {
+    handleSignOut: handleSignOut,
+    isMobile: isMobile,
+    user: user,
   }
+
+  useEffect(() => {
+    setUser(user)
+  }, [setUser, user])
 
   return (
     <Box>
@@ -62,17 +74,24 @@ export const Header: React.FC = () => {
             aria-label={'Toggle Navigation'}
           />
         </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-          <Text
-            textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-            fontFamily={'heading'}
-            color={useColorModeValue('gray.800', 'white')}
-          >
-            Logo
-          </Text>
+        <Flex
+          flex={{ base: 1 }}
+          alignItems="center"
+          justify={{ base: 'center', md: 'start' }}
+        >
+          <NextLink href="/">
+            <Box
+              textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
+              fontFamily={'heading'}
+              color={useColorModeValue('gray.800', 'white')}
+              cursor="pointer"
+            >
+              Logo
+            </Box>
+          </NextLink>
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-            <DesktopNav />
+            <DesktopNav isMobile={isMobile} />
           </Flex>
         </Flex>
 
@@ -82,10 +101,10 @@ export const Header: React.FC = () => {
           direction={'row'}
           spacing={6}
         >
-          {isSignedIn ? (
+          {user ? (
             <Button
               display={{ base: 'none', md: 'inline-flex' }}
-              fontSize={'sm'}
+              size={isMobile ? 'sm' : 'md'}
               fontWeight={600}
               colorScheme="teal"
               onClick={() => handleSignOut()}
@@ -94,55 +113,67 @@ export const Header: React.FC = () => {
             </Button>
           ) : (
             <>
-              <Button fontSize={'sm'} fontWeight={400} variant={'link'}>
-                <NextLink href="/signin">ログイン</NextLink>
-              </Button>
-              <Button
-                display={{ base: 'none', md: 'inline-flex' }}
-                fontSize={'sm'}
-                fontWeight={600}
-                colorScheme="teal"
-              >
-                <NextLink href="/signup">
-                  <a style={{ color: 'white' }}>登録する</a>
-                </NextLink>
-              </Button>
+              <NextLink href="/signin">
+                <Button
+                  display={{ base: 'none', md: 'inline-flex' }}
+                  size={isMobile ? 'sm' : 'md'}
+                  fontWeight={400}
+                  variant={'link'}
+                >
+                  ログイン
+                </Button>
+              </NextLink>
+
+              <NextLink href="/signup" passHref>
+                <a style={{ color: 'white' }}>
+                  <Button
+                    display={{ base: 'none', md: 'inline-flex' }}
+                    size={isMobile ? 'sm' : 'md'}
+                    fontWeight={600}
+                    colorScheme="teal"
+                  >
+                    登録する
+                  </Button>
+                </a>
+              </NextLink>
             </>
           )}
         </Stack>
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
+        <MobileNav {...mobileNav} />
       </Collapse>
     </Box>
   )
 }
 
-const DesktopNav = () => {
+const DesktopNav: React.FC<{ isMobile: boolean }> = ({ isMobile }) => {
   const linkColor = useColorModeValue('gray.600', 'gray.200')
   const linkHoverColor = useColorModeValue('gray.800', 'white')
-  const popoverContentBgColor = useColorModeValue('white', 'gray.800')
+  // const popoverContentBgColor = useColorModeValue('white', 'gray.800')
 
   return (
     <Stack direction={'row'} spacing={4}>
       {NAV_ITEMS.map((navItem) => (
         <Box key={navItem.label}>
-          <Popover trigger={'hover'} placement={'bottom-start'}>
+          {/* <Popover trigger={'hover'} placement={'bottom-start'}>
             <PopoverTrigger>
-              <Link
-                p={2}
-                href={navItem.href ?? '#'}
-                fontSize={'sm'}
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                {navItem.label}
-              </Link>
+              <NextLink href={navItem.href}>
+                <Box
+                  p={2}
+                  fontSize={isMobile ? "xs" : "sm"}
+                  fontWeight={500}
+                  color={linkColor}
+                  _hover={{
+                    textDecoration: 'none',
+                    color: linkHoverColor,
+                  }}
+                  cursor='pointer'
+                >
+                  {navItem.label}
+                </Box>
+              </NextLink>
             </PopoverTrigger>
 
             {navItem.children && (
@@ -161,47 +192,72 @@ const DesktopNav = () => {
                 </Stack>
               </PopoverContent>
             )}
-          </Popover>
+          </Popover> */}
+          <NextLink href={navItem.href}>
+            <Box
+              p={2}
+              fontSize={isMobile ? 'xs' : 'sm'}
+              fontWeight={500}
+              color={linkColor}
+              _hover={{
+                textDecoration: 'none',
+                color: linkHoverColor,
+              }}
+              cursor="pointer"
+            >
+              {navItem.label}
+            </Box>
+          </NextLink>
         </Box>
       ))}
     </Stack>
   )
 }
 
-const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
-  return (
-    <Link
-      href={href}
-      role={'group'}
-      display={'block'}
-      p={2}
-      rounded={'md'}
-      _hover={{ bg: useColorModeValue('teal.100', 'gray.900') }}
-    >
-      <Stack direction={'row'} align={'center'}>
-        <Box>
-          <Text transition={'all .3s ease'} fontWeight={500}>
-            {label}
-          </Text>
-          <Text fontSize={'sm'}>{subLabel}</Text>
-        </Box>
-        <Flex
-          transition={'all .3s ease'}
-          transform={'translateX(-10px)'}
-          opacity={0}
-          _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
-          justify={'flex-end'}
-          align={'center'}
-          flex={1}
-        >
-          <Icon color={'teal.400'} w={5} h={5} as={ChevronRightIcon} />
-        </Flex>
-      </Stack>
-    </Link>
-  )
-}
+// const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
+//   return (
+//     <Link
+//       href={href}
+//       role={'group'}
+//       display={'block'}
+//       p={2}
+//       rounded={'md'}
+//       _hover={{ bg: useColorModeValue('teal.100', 'gray.900') }}
+//     >
+//       <Stack direction={'row'} align={'center'}>
+//         <Box>
+//           <Text transition={'all .3s ease'} fontWeight={500}>
+//             {label}
+//           </Text>
+//           <Text fontSize={isMobile ? "xs" : "sm"}>{subLabel}</Text>
+//         </Box>
+//         <Flex
+//           transition={'all .3s ease'}
+//           transform={'translateX(-10px)'}
+//           opacity={0}
+//           _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
+//           justify={'flex-end'}
+//           align={'center'}
+//           flex={1}
+//         >
+//           <Icon color={'teal.400'} w={5} h={5} as={ChevronRightIcon} />
+//         </Flex>
+//       </Stack>
+//     </Link>
+//   )
+// }
 
-const MobileNav = () => {
+const MobileNav = ({ handleSignOut, isMobile, user }: MobileNav) => {
+  const getMobileItem = (navItem: NavItem): MobileItem => {
+    return {
+      label: navItem.label,
+      children: navItem.children,
+      href: navItem.href,
+      handleSignOut,
+      isMobile,
+      user,
+    }
+  }
   return (
     <Stack
       bg={useColorModeValue('white', 'gray.800')}
@@ -209,43 +265,87 @@ const MobileNav = () => {
       display={{ md: 'none' }}
     >
       {NAV_ITEMS.map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
+        <MobileNavItem key={navItem.label} {...getMobileItem(navItem)} />
       ))}
+      {user ? (
+        <>
+          <Stack spacing={4}>
+            <Box
+              py={2}
+              _hover={{
+                textDecoration: 'none',
+              }}
+            >
+              <Link onClick={handleSignOut}>ログアウト</Link>
+            </Box>
+          </Stack>
+        </>
+      ) : (
+        <>
+          <Stack spacing={4}>
+            <Box
+              py={2}
+              _hover={{
+                textDecoration: 'none',
+              }}
+            >
+              <NextLink href="/signin">ログイン</NextLink>
+            </Box>
+          </Stack>
+          <Stack spacing={4}>
+            <Box
+              py={2}
+              _hover={{
+                textDecoration: 'none',
+              }}
+            >
+              <NextLink href="/signup">登録する</NextLink>
+            </Box>
+          </Stack>
+        </>
+      )}
     </Stack>
   )
 }
 
-const MobileNavItem = ({ label, children, href }: NavItem) => {
+const MobileNavItem = ({
+  label,
+  children,
+  href,
+  isMobile,
+  handleSignOut,
+  user,
+}: MobileItem) => {
   const { isOpen, onToggle } = useDisclosure()
 
   return (
     <Stack spacing={4} onClick={children && onToggle}>
-      <Flex
-        py={2}
-        as={Link}
-        href={href ?? '#'}
-        justify={'space-between'}
-        align={'center'}
-        _hover={{
-          textDecoration: 'none',
-        }}
-      >
-        <Text
-          fontWeight={600}
-          color={useColorModeValue('gray.600', 'gray.200')}
+      <NextLink href={href}>
+        <Flex
+          py={2}
+          justify={'space-between'}
+          align={'center'}
+          _hover={{
+            textDecoration: 'none',
+          }}
         >
-          {label}
-        </Text>
-        {children && (
-          <Icon
-            as={ChevronDownIcon}
-            transition={'all .25s ease-in-out'}
-            transform={isOpen ? 'rotate(180deg)' : ''}
-            w={6}
-            h={6}
-          />
-        )}
-      </Flex>
+          <Text
+            fontWeight={600}
+            color={useColorModeValue('gray.600', 'gray.200')}
+          >
+            {label}
+          </Text>
+          {children && (
+            <Icon
+              as={ChevronDownIcon}
+              transition={'all .25s ease-in-out'}
+              transform={isOpen ? 'rotate(180deg)' : ''}
+              w={6}
+              h={6}
+            />
+          )}
+        </Flex>
+      </NextLink>
 
       <Collapse
         in={isOpen}
@@ -276,7 +376,23 @@ interface NavItem {
   label: string
   subLabel?: string
   children?: Array<NavItem>
-  href?: string
+  href: string
+}
+
+interface MobileNav {
+  handleSignOut: () => void
+  isMobile: boolean
+  user: User | undefined | null
+}
+
+interface MobileItem {
+  label: string
+  subLabel?: string
+  children?: Array<NavItem>
+  href: string
+  handleSignOut: () => void
+  isMobile: boolean
+  user: User | undefined | null
 }
 
 const NAV_ITEMS: Array<NavItem> = [

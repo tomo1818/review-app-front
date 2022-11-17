@@ -8,8 +8,7 @@ const options = {
 
 const client = applyCaseMiddleware(
   axios.create({
-    baseURL: 'http://localhost:8080/api/v1',
-    // baseURL: 'https://restless-glitter-6164.fly.dev/api/v1',
+    baseURL: process.env.NEXT_PUBLIC_BASE_URL,
     // 必要ないかも
     // headers: {
     //   "Content-Type": "multipart/form-data" // 画像ファイルを取り扱うのでform-dataで送信

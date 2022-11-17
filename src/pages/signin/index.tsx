@@ -1,15 +1,16 @@
 import Cookies from 'js-cookie'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
+import { useRecoilState } from 'recoil'
 import { SignForm } from '@/components/users/SignForm'
-import { AuthContext } from '@/context/AuthContext'
 import { signIn } from '@/lib/api/auth'
+import { userValueSelector } from '@/store/user-store'
 
 const SignIn: NextPage = () => {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
-  const { setIsSignedIn, setCurrentUser, currentUser } = useContext(AuthContext)
+  const [user, setUser] = useRecoilState(userValueSelector)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -32,10 +33,7 @@ const SignIn: NextPage = () => {
         Cookies.set('_access_token', res.headers['access-token'])
         Cookies.set('_client', res.headers['client'])
         Cookies.set('_uid', res.headers['uid'])
-
-        setIsSignedIn(true)
-        setCurrentUser(res.data.data)
-
+        setUser(res.data.data)
         router.push('/')
       }
     } catch (e) {
@@ -54,7 +52,7 @@ const SignIn: NextPage = () => {
       title="ログイン"
       signType="signIn"
       handleSubmit={signInHandleSubmit}
-      currentUser={currentUser}
+      currentUser={user}
     />
   )
 }

@@ -8,7 +8,7 @@ export const getCategories = (groupId: number): AxiosPromise<Category[]> => {
 }
 
 // カテゴリーを取得
-export const getCategory = (id: number) => {
+export const getCategory = (id: number): AxiosPromise<Category> => {
   return client.get(`/categories/${id}/get_category`)
 }
 

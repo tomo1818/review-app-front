@@ -17,6 +17,7 @@ import { Container } from '@/components/utils/Container'
 import { Spacer } from '@/components/utils/Spacer'
 import { useDevice } from '@/hooks/use-device'
 import { updateShop } from '@/lib/api/shop'
+import { Review } from '@/types/review'
 import { Shop, ShopParams } from '@/types/shop'
 
 type Props = {
@@ -29,13 +30,20 @@ export const LayoutShopDetail: React.FC<Props> = ({ shop, setShop }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { isMobile } = useDevice()
 
+  const setShopReviews = (review: Review) => {
+    const newReviews = [...reviews, review]
+    const newShop = { ...shop, reviews: newReviews }
+    setReviews(newReviews)
+    setShop(newShop)
+  }
+
   const {
     register,
     handleSubmit,
     setValue,
     getValues,
     control,
-    reset,
+    // reset,
     formState: { errors },
   } = useForm<ShopParams>({
     defaultValues: {
@@ -54,10 +62,9 @@ export const LayoutShopDetail: React.FC<Props> = ({ shop, setShop }) => {
   const handleEdit = handleSubmit(async (data) => {
     try {
       const res = await updateShop(shop.id, data)
-      console.log(res.data)
       setShop(res.data)
       onClose()
-      reset()
+      // reset()
     } catch (e) {
       console.log(e)
     }
@@ -71,28 +78,21 @@ export const LayoutShopDetail: React.FC<Props> = ({ shop, setShop }) => {
         color={'blackAlpha.900'}
       >
         <BreadcrumbItem>
-          <BreadcrumbLink as={Link} href={`/group`}>
-            グループ一覧
-          </BreadcrumbLink>
+          <Link href={`/group`}>グループ一覧</Link>
         </BreadcrumbItem>
 
         <BreadcrumbItem>
-          <BreadcrumbLink as={Link} href={`/group/${shop.groupId}`}>
-            カテゴリー一覧
-          </BreadcrumbLink>
+          <Link href={`/group/${shop.groupId}`}>カテゴリー一覧</Link>
         </BreadcrumbItem>
 
         <BreadcrumbItem>
-          <BreadcrumbLink
-            as={Link}
-            href={`/group/${shop.groupId}/${shop.categoryId}`}
-          >
+          <Link href={`/group/${shop.groupId}/${shop.categoryId}`}>
             ショップ一覧
-          </BreadcrumbLink>
+          </Link>
         </BreadcrumbItem>
 
         <BreadcrumbItem>
-          <BreadcrumbLink>{shop.name}</BreadcrumbLink>
+          <BreadcrumbLink cursor="initial">{shop.name}</BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
       <Spacer size={isMobile ? 15 : 30} />
@@ -101,19 +101,25 @@ export const LayoutShopDetail: React.FC<Props> = ({ shop, setShop }) => {
         name={shop.name}
         groupId={shop.groupId}
         categoryId={shop.categoryId}
-        description="ディスクリプションディスクリプションディスクリプションディスクリプション"
+        description={shop.description}
+        category={shop.category}
         id={shop.id}
         tags={shop.tags}
         url={shop.url}
       />
       <Spacer size={5} />
       <Box justifyContent="flex-end" display="flex">
-        <Button variant="solid" colorScheme="teal" onClick={onOpen}>
+        <Button
+          size={isMobile ? 'sm' : 'md'}
+          variant="solid"
+          colorScheme="teal"
+          onClick={onOpen}
+        >
           編集する
         </Button>
       </Box>
-      <Spacer size={50} />
-      <Reviews reviews={reviews} setReviews={setReviews} />
+      <Spacer size={isMobile ? 15 : 50} />
+      <Reviews reviews={reviews} setReviews={setShopReviews} shop={shop} />
 
       <ShopModal
         onSubmit={handleEdit}

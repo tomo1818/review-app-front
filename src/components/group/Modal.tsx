@@ -16,6 +16,7 @@ import {
 import { css } from '@emotion/react'
 import { BaseSyntheticEvent } from 'react'
 import { FieldErrorsImpl, UseFormRegister } from 'react-hook-form'
+import { useDevice } from '@/hooks/use-device'
 import { GroupParams } from '@/types/group'
 
 type Props = {
@@ -37,13 +38,12 @@ export const GroupModal: React.FC<Props> = ({
   register,
   errors,
 }) => {
+  const { isMobile } = useDevice()
   return (
     <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>
-          カテゴリーを{isEdit ? '更新する' : '追加する'}
-        </ModalHeader>
+        <ModalHeader>グループを{isEdit ? '更新する' : '追加する'}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Flex align={'center'}>
@@ -70,10 +70,19 @@ export const GroupModal: React.FC<Props> = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="teal" mr={3} onClick={handleSubmit}>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            colorScheme="teal"
+            mr={3}
+            onClick={handleSubmit}
+          >
             {isEdit ? '更新する' : '追加する'}
           </Button>
-          <Button colorScheme="blue" onClick={onClose}>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            colorScheme="blue"
+            onClick={onClose}
+          >
             戻る
           </Button>
         </ModalFooter>

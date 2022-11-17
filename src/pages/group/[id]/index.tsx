@@ -1,37 +1,57 @@
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useCallback, useContext, useEffect, useState } from 'react'
-import { AuthContext } from '@/context/AuthContext'
+import { useCallback, useEffect } from 'react'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { LayoutCategories } from '@/layouts/categories/LayoutCategories'
 import { getCategories } from '@/lib/api/category'
-import { Category } from '@/types/category'
+import { categoriesAtom } from '@/store/category-store'
+import { userValueSelector } from '@/store/user-store'
 
-const CategoryPage: NextPage = () => {
-  const { loading, currentUser } = useContext(AuthContext)
-  const [categories, setCategories] = useState<Category[]>([])
+type Props = {
+  groupId: string
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const groupId = params?.id as string
+
+  return {
+    props: {
+      groupId,
+    },
+  }
+}
+
+const CategoryPage: NextPage<Props> = ({ groupId }) => {
+  const user = useRecoilValue(userValueSelector)
+  const [categories, setCategories] = useRecoilState(categoriesAtom(groupId))
   const router = useRouter()
-  const id = router.query.id
 
   const handleGetCategories = useCallback(async () => {
-    const categoriesRes = await getCategories(Number(id))
-    setCategories(categoriesRes.data)
-  }, [id])
+    if (!categories) {
+      console.log('get category by api')
+      const categoriesRes = await getCategories(Number(groupId))
+      setCategories(categoriesRes.data)
+    }
+  }, [categories, groupId, setCategories])
 
   useEffect(() => {
-    if (!loading && router.isReady) {
-      if (currentUser) {
-        handleGetCategories()
-      } else {
-        router.push('/signin')
-      }
+    if (user) {
+      handleGetCategories()
+    } else {
+      router.push('/signin')
     }
-  }, [currentUser, handleGetCategories, loading, router])
+  }, [handleGetCategories, router, user])
+
   return (
-    <LayoutCategories
-      categories={categories}
-      groupId={Number(id)}
-      setCategories={setCategories}
-    />
+    <>
+      {categories && (
+        <LayoutCategories
+          categories={categories}
+          groupId={Number(groupId)}
+          setCategories={setCategories}
+        />
+      )}
+    </>
   )
 }
 

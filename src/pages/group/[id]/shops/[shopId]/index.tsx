@@ -12,31 +12,31 @@ import { Shop } from '@/types/shop'
 
 type Props = {
   groupId: string
-  categoryId: string
   shopId: string
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const groupId = params?.id as string
-  const categoryId = params?.categoryId as string
   const shopId = params?.shopId as string
 
   return {
     props: {
       groupId,
-      categoryId,
       shopId,
     },
   }
 }
 
-const ShopDetailPage: NextPage<Props> = ({ groupId, categoryId, shopId }) => {
+const ShopDetailPage: NextPage<Props> = ({ groupId, shopId }) => {
   const user = useRecoilValue(userValueSelector)
   const [value, setValue] = useRecoilState(shopAtom(shopId))
   const router = useRouter()
 
   const setShop = (shop: Shop) => {
-    if (value) setValue({ ...value, shop: shop })
+    if (value) {
+      console.log('shopを変更')
+      setValue({ ...value, shop: shop })
+    }
   }
 
   const handleGetShop = useCallback(async () => {
@@ -44,7 +44,7 @@ const ShopDetailPage: NextPage<Props> = ({ groupId, categoryId, shopId }) => {
       const shopRes = await getShop(Number(shopId))
       const { shop, avgScore } = shopRes.data
       console.log(avgScore)
-      const categoryRes = await getCategory(shop.id)
+      const categoryRes = await getCategory(shop.categoryId)
       setValue({ category: categoryRes.data, shop: shop })
     }
   }, [shopId, setValue, value])

@@ -1,3 +1,4 @@
+import { Category } from './category'
 import { Review } from './review'
 import { Tag } from './tag'
 
@@ -24,6 +25,7 @@ export type Shop = {
   tagString: string
   tags: Tag[]
   reviews: Review[]
+  category: Category
   url: string
   description: string
   createdAt: Date

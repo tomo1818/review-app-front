@@ -19,6 +19,7 @@ import {
   NumberInputStepper,
   Textarea,
 } from '@chakra-ui/react'
+import { useDevice } from '@/hooks/use-device'
 
 type Props = {
   params: {
@@ -40,6 +41,7 @@ export const FormModal: React.FC<Props> = ({
   isOpen,
   onClose,
 }) => {
+  const { isMobile } = useDevice()
   return (
     <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -87,10 +89,19 @@ export const FormModal: React.FC<Props> = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="teal" mr={3} onClick={handleSubmit}>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            colorScheme="teal"
+            mr={3}
+            onClick={handleSubmit}
+          >
             追加する
           </Button>
-          <Button colorScheme="blue" onClick={onClose}>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            colorScheme="blue"
+            onClick={onClose}
+          >
             戻る
           </Button>
         </ModalFooter>

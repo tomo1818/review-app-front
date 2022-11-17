@@ -31,6 +31,7 @@ import {
   useWatch,
 } from 'react-hook-form'
 import { Spacer } from '../utils/Spacer'
+import { useDevice } from '@/hooks/use-device'
 import { ShopParams } from '@/types/shop'
 
 type Props = {
@@ -70,8 +71,8 @@ export const ShopModal: React.FC<Props> = ({
   errors,
   isEdit = false,
 }) => {
+  const { isMobile } = useDevice()
   const [tagName, setTagName] = useState('')
-
   const [isDone, setIsDone] = useState(getValues('done'))
   const tagString = useWatch({
     control,
@@ -185,14 +186,13 @@ export const ShopModal: React.FC<Props> = ({
                   />
                   <IconButton
                     aria-label="add tag"
-                    size="md"
                     icon={<AddIcon />}
                     onClick={() => addTags(tagName)}
                   />
                 </Box>
                 {tags.length > 0 && tagString !== '' && (
                   <>
-                    <Spacer size={10} />
+                    <Spacer size={isMobile ? 5 : 10} />
                     <div css={tagWrapper}>
                       {tags.map((tag, index) => (
                         <Tag key={index} paddingRight={0}>
@@ -214,10 +214,19 @@ export const ShopModal: React.FC<Props> = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="teal" mr={3} onClick={onSubmit}>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            colorScheme="teal"
+            mr={3}
+            onClick={onSubmit}
+          >
             {isEdit ? '更新する' : '追加する'}
           </Button>
-          <Button colorScheme="blue" onClick={onClose}>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            colorScheme="blue"
+            onClick={onClose}
+          >
             戻る
           </Button>
         </ModalFooter>
