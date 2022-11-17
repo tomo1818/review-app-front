@@ -1,6 +1,7 @@
 import { Box, Text } from '@chakra-ui/react'
 import { css } from '@emotion/react'
 import { Spacer } from '../utils/Spacer'
+import { useDevice } from '@/hooks/use-device'
 import { Review } from '@/types/review'
 
 type Props = {
@@ -8,6 +9,7 @@ type Props = {
 }
 
 export const ReviewView: React.FC<Props> = ({ review }) => {
+  const { isMobile } = useDevice()
   return (
     <Box css={reviewWrapper} border="1px solid" borderColor="blackAlpha.400">
       <Box
@@ -15,12 +17,12 @@ export const ReviewView: React.FC<Props> = ({ review }) => {
         borderBottom="1px solid"
         borderColor="blackAlpha.200"
       >
-        <Text size="lg">{review.author}</Text>
+        <Text fontSize={isMobile ? 'md' : 'lg'}>{review.author}</Text>
       </Box>
-      <Spacer size={15} />
-      <Text size="sm">{review.comment}</Text>
-      <Spacer size={15} />
-      <Box>画像が入る</Box>
+      <Spacer size={isMobile ? 5 : 15} />
+      <Text fontSize={isMobile ? 'xs' : 'sm'}>{review.comment}</Text>
+      {/* <Spacer size={15} />
+      <Box>画像が入る</Box> */}
     </Box>
   )
 }

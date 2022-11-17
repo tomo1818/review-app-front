@@ -1,10 +1,18 @@
 import { ChevronRightIcon } from '@chakra-ui/icons'
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   Button,
   Heading,
+  Tag,
+  TagLabel,
   useDisclosure,
 } from '@chakra-ui/react'
 import { css } from '@emotion/react'
@@ -22,14 +30,33 @@ import { createShop } from '@/lib/api/shop'
 import { createCategoryFormData } from '@/lib/functions/category'
 import { Category, CategoryParams } from '@/types/category'
 import { Shop, ShopParams } from '@/types/shop'
+import { Tag as TagType } from '@/types/tag'
 
 type Props = {
   category?: Category
+  categories?: Category[]
+  tags?: TagType[]
   shops: Shop[]
   setShops: (value: Shop[]) => void
+  setCategory?: (value: Category) => void
+  tagFilter?: (value: number) => void
+  categoryFilter?: (value: number) => void
+  filteredTags?: number[]
+  filteredCategories?: number[]
 }
 
-export const LayoutShop: React.FC<Props> = ({ category, shops, setShops }) => {
+export const LayoutShop: React.FC<Props> = ({
+  category,
+  shops,
+  setShops,
+  setCategory,
+  tags,
+  categories,
+  tagFilter = (value) => console.log(value),
+  categoryFilter = (value) => console.log(value),
+  filteredTags = [],
+  filteredCategories = [],
+}) => {
   const router = useRouter()
   const { id, categoryId } = router.query
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -64,7 +91,7 @@ export const LayoutShop: React.FC<Props> = ({ category, shops, setShops }) => {
     register: categoryRegister,
     handleSubmit: categoryHandleSubmit,
     setValue: categorySetValue,
-    reset: resetCategoryForm,
+    // reset: resetCategoryForm,
     formState: { errors: categoryErrors },
   } = useForm<CategoryParams>({
     defaultValues: {
@@ -77,7 +104,6 @@ export const LayoutShop: React.FC<Props> = ({ category, shops, setShops }) => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       const res = await createShop(data)
-      console.log(res.data)
       setShops([...shops, res.data])
       reset()
       onClose()
@@ -91,9 +117,9 @@ export const LayoutShop: React.FC<Props> = ({ category, shops, setShops }) => {
     const formData = createCategoryFormData(data)
     try {
       const res = await updateCategory(category ? category.id : 0, formData)
-      console.log(res.data)
-      onClose()
-      resetCategoryForm()
+      if (setCategory) setCategory(res.data)
+      onEditClose()
+      // resetCategoryForm()
     } catch (e) {
       console.log(e)
     }
@@ -107,35 +133,24 @@ export const LayoutShop: React.FC<Props> = ({ category, shops, setShops }) => {
         color={'blackAlpha.900'}
       >
         <BreadcrumbItem>
-          <BreadcrumbLink as={Link} href={`/group`}>
-            グループ一覧
-          </BreadcrumbLink>
+          <Link href={`/group`}>グループ一覧</Link>
         </BreadcrumbItem>
 
         {category ? (
           <>
             <BreadcrumbItem>
-              <BreadcrumbLink as={Link} href={`/group/${category.groupId}`}>
-                カテゴリー一覧
-              </BreadcrumbLink>
+              <Link href={`/group/${category.groupId}`}>カテゴリー一覧</Link>
             </BreadcrumbItem>
 
             <ChevronRightIcon color="gray.500" margin="0px 4px" />
 
             <BreadcrumbItem>
-              <BreadcrumbLink
-                as={Link}
-                href={`/group/${category.groupId}/${category.id}`}
-              >
-                {category.name}
-              </BreadcrumbLink>
+              <BreadcrumbLink cursor="initial">{category.name}</BreadcrumbLink>
             </BreadcrumbItem>
           </>
         ) : (
           <BreadcrumbItem>
-            <BreadcrumbLink as={Link} href={`/group/shops`}>
-              ショップ一覧
-            </BreadcrumbLink>
+            <BreadcrumbLink cursor="initial">全て</BreadcrumbLink>
           </BreadcrumbItem>
         )}
       </Breadcrumb>
@@ -146,17 +161,89 @@ export const LayoutShop: React.FC<Props> = ({ category, shops, setShops }) => {
         </Heading>
         {category && (
           <div css={buttonWrapper}>
-            <Button variant="solid" colorScheme="teal" onClick={onOpen}>
+            <Button
+              size={isMobile ? 'sm' : 'md'}
+              variant="solid"
+              colorScheme="teal"
+              onClick={onOpen}
+            >
               追加する
             </Button>
-            <Button variant="solid" colorScheme="teal" onClick={onEditOpen}>
+            <Button
+              size={isMobile ? 'sm' : 'md'}
+              variant="solid"
+              colorScheme="teal"
+              onClick={onEditOpen}
+            >
               編集する
             </Button>
           </div>
         )}
       </div>
+      <Spacer size={isMobile ? 10 : 20} />
+      {categories && tags && (
+        <Accordion defaultIndex={[]} allowMultiple>
+          <AccordionItem>
+            <h2>
+              <AccordionButton>
+                <Box flex="1" textAlign="left">
+                  カテゴリーでの絞り込み
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel py={2} gap={2} display="flex" flexWrap="wrap">
+              {categories.map((category) => (
+                <Tag
+                  size="md"
+                  key={category.id}
+                  borderRadius="full"
+                  variant={
+                    filteredCategories.indexOf(category.id) !== -1
+                      ? 'solid'
+                      : 'outline'
+                  }
+                  colorScheme="green"
+                  cursor="pointer"
+                  onClick={() => categoryFilter(category.id)}
+                >
+                  <TagLabel>{category.name}</TagLabel>
+                </Tag>
+              ))}
+            </AccordionPanel>
+          </AccordionItem>
+
+          <AccordionItem>
+            <h2>
+              <AccordionButton>
+                <Box flex="1" textAlign="left">
+                  タグでの絞り込み
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel py={2} gap={2} display="flex" flexWrap="wrap">
+              {tags.map((tag) => (
+                <Tag
+                  size="md"
+                  key={tag.id}
+                  borderRadius="full"
+                  variant={
+                    filteredTags.indexOf(tag.id) !== -1 ? 'solid' : 'outline'
+                  }
+                  colorScheme="green"
+                  cursor="pointer"
+                  onClick={() => tagFilter(tag.id)}
+                >
+                  <TagLabel>{tag.name}</TagLabel>
+                </Tag>
+              ))}
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
+      )}
       <Spacer size={isMobile ? 20 : 40} />
-      <div css={shopsWrapper}>
+      <div css={shopsWrapper} data-view-mobile={isMobile}>
         {shops.map((shop, index) => (
           <ShopView
             key={index}
@@ -170,10 +257,12 @@ export const LayoutShop: React.FC<Props> = ({ category, shops, setShops }) => {
             tags={shop.tags}
             reviews={shop.reviews}
             visitDay={shop.visitDay}
+            category={shop.category}
             url={shop.url}
             description={shop.description}
             createdAt={shop.createdAt}
             updatedAt={shop.updatedAt}
+            isMessageShort={true}
           />
         ))}
       </div>
@@ -207,6 +296,10 @@ export const LayoutShop: React.FC<Props> = ({ category, shops, setShops }) => {
 }
 
 const shopsWrapper = css`
+  &[data-view-mobile='true'] {
+    gap: 10px;
+  }
+
   display: flex;
   flex-direction: column;
   gap: 20px;

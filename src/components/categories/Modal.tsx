@@ -18,6 +18,7 @@ import { css } from '@emotion/react'
 import { BaseSyntheticEvent, useCallback, useRef, useState } from 'react'
 import { FieldErrorsImpl, UseFormRegister } from 'react-hook-form'
 import { Thumbnail } from '../utils/Thumbnail'
+import { useDevice } from '@/hooks/use-device'
 import { CategoryParams } from '@/types/category'
 
 type Props = {
@@ -52,6 +53,7 @@ export const CategoryModal: React.FC<Props> = ({
     else setPreview('')
   }, [])
   const inputRef = useRef<HTMLInputElement>(null)
+  const { isMobile } = useDevice()
 
   return (
     <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
@@ -110,10 +112,19 @@ export const CategoryModal: React.FC<Props> = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="teal" mr={3} onClick={handleSubmit}>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            colorScheme="teal"
+            mr={3}
+            onClick={handleSubmit}
+          >
             {isEdit ? '更新する' : '追加する'}
           </Button>
-          <Button colorScheme="blue" onClick={onClose}>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            colorScheme="blue"
+            onClick={onClose}
+          >
             戻る
           </Button>
         </ModalFooter>

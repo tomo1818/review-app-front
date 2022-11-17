@@ -7,6 +7,7 @@ import {
   Button,
 } from '@chakra-ui/react'
 import { RefObject } from 'react'
+import { useDevice } from '@/hooks/use-device'
 import { User } from '@/types/user'
 
 type Props = {
@@ -26,6 +27,7 @@ export const ConfirmDialog: React.FC<Props> = ({
   situation,
   handleEdit,
 }) => {
+  const { isMobile } = useDevice()
   return (
     <AlertDialog
       isOpen={isOpen}
@@ -34,17 +36,29 @@ export const ConfirmDialog: React.FC<Props> = ({
     >
       <AlertDialogOverlay>
         <AlertDialogContent>
-          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+          <AlertDialogHeader
+            fontSize={isMobile ? 'md' : 'lg'}
+            fontWeight="bold"
+          >
             {situation === 'add'
               ? `${user.name}をグループに追加します`
               : `${user.name}をグループから削除します`}
           </AlertDialogHeader>
 
           <AlertDialogFooter>
-            <Button onClick={() => handleEdit(user.id)}>
+            <Button
+              size={isMobile ? 'sm' : 'md'}
+              onClick={() => handleEdit(user.id)}
+            >
               {situation === 'add' ? '追加' : '削除'}する
             </Button>
-            <Button ref={cancelRef} colorScheme="teal" onClick={onClose} ml={3}>
+            <Button
+              size={isMobile ? 'sm' : 'md'}
+              ref={cancelRef}
+              colorScheme="teal"
+              onClick={onClose}
+              ml={3}
+            >
               戻る
             </Button>
           </AlertDialogFooter>

@@ -16,6 +16,7 @@ import {
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { useDevice } from '@/hooks/use-device'
 import { User } from '@/types/user'
 
 type Props = {
@@ -52,6 +53,7 @@ export const SignForm: React.FC<Props> = ({
   currentUser,
 }: Props) => {
   const router = useRouter()
+  const { isMobile } = useDevice()
 
   useEffect(() => {
     if (currentUser) router.push('/')
@@ -59,8 +61,8 @@ export const SignForm: React.FC<Props> = ({
 
   return (
     <Flex
-      minH={'100vh'}
-      align={'center'}
+      minH={`calc(100vh - 60px)`}
+      // align={'center'}
       justify={'center'}
       bg={useColorModeValue('gray.50', 'gray.800')}
     >
@@ -126,7 +128,7 @@ export const SignForm: React.FC<Props> = ({
             <Stack spacing={10} pt={2}>
               <Button
                 loadingText="Submitting"
-                size="lg"
+                size={isMobile ? 'md' : 'lg'}
                 bg={'blue.400'}
                 color={'white'}
                 _hover={{

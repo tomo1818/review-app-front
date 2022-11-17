@@ -1,8 +1,5 @@
 import Cookies from 'js-cookie'
-import { useEffect } from 'react'
-import { useRecoilState, useResetRecoilState } from 'recoil'
 import client from './client'
-import { userState } from '@/store/user-store'
 import { HeadersItem, SignInParams, SignUpParams } from '@/types/auth'
 
 export const signUp = (params: SignUpParams) => {
@@ -37,28 +34,4 @@ export const getCurrentUser = () => {
       uid: Cookies.get('_uid') as HeadersItem,
     },
   })
-}
-
-export const useAuth = () => {
-  const [currentUser, setCurrentUser] = useRecoilState(userState)
-  const resetStatus = useResetRecoilState(userState)
-
-  useEffect(() => {
-    if (currentUser) return
-    const handleGetCurrentUser = async () => {
-      try {
-        const res = await getCurrentUser()
-        if (res?.data.isLogin === true) {
-          setCurrentUser(res?.data.data)
-        } else {
-          resetStatus()
-        }
-      } catch (e) {
-        console.log(e, 'error')
-      }
-    }
-    handleGetCurrentUser()
-  }, [currentUser, resetStatus, setCurrentUser])
-
-  return currentUser
 }

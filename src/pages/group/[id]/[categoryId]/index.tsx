@@ -1,20 +1,51 @@
 import { Spinner } from '@chakra-ui/react'
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useCallback, useContext, useEffect, useState } from 'react'
-import { AuthContext } from '@/context/AuthContext'
+import { useCallback, useEffect } from 'react'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { LayoutShop } from '@/layouts/shop/LayoutShop'
 import { getCategory } from '@/lib/api/category'
 import { getShops } from '@/lib/api/shop'
+import { shopsAtom } from '@/store/shop-store'
+import { userValueSelector } from '@/store/user-store'
 import { Category } from '@/types/category'
 import { Shop } from '@/types/shop'
 
-const CategoryDetailPage: NextPage = () => {
-  const { loading, currentUser } = useContext(AuthContext)
-  const [category, setCategory] = useState<Category>()
-  const [shops, setShops] = useState<Shop[]>()
+type Props = {
+  groupId: string
+  categoryId: string
+  tagId?: string
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const groupId = params?.id as string
+  const categoryId = params?.categoryId as string
+
+  return {
+    props: {
+      groupId,
+      categoryId,
+      tagId: null,
+    },
+  }
+}
+
+const CategoryDetailPage: NextPage<Props> = ({
+  groupId,
+  categoryId,
+  tagId,
+}) => {
+  const user = useRecoilValue(userValueSelector)
+  const [value, setValue] = useRecoilState(shopsAtom(categoryId))
   const router = useRouter()
-  const { categoryId, tagId } = router.query
+
+  const setShops = (shops: Shop[]) => {
+    if (value) setValue({ ...value, shops: shops })
+  }
+
+  const setCategory = (category: Category) => {
+    if (value) setValue({ ...value, category: category })
+  }
 
   const isTag = useCallback(
     (shop: Shop) => {
@@ -37,38 +68,33 @@ const CategoryDetailPage: NextPage = () => {
 
   useEffect(() => {
     const handleData = async () => {
-      const categoryRes = await getCategory(Number(categoryId))
-      if (tagId) {
-        console.log(tagId)
+      if (!value) {
+        console.log('get shops by api')
+        const categoryRes = await getCategory(Number(categoryId))
+        const shopsRes = await getShops(Number(categoryRes.data.id))
+        setValue({ category: categoryRes.data, shops: shopsRes.data })
       }
-      setCategory(categoryRes.data)
-      const shopsRes = await getShops(Number(categoryRes.data.id))
-      setShops(shopsRes.data)
     }
-
-    if (router.isReady && !loading) {
-      if (currentUser) {
-        handleData()
-      } else router.push('/signin')
+    if (user) {
+      handleData()
+    } else {
+      router.push('/signin')
     }
-  }, [categoryId, currentUser, loading, router, tagId])
+  }, [categoryId, router, setValue, user, value])
 
   return (
-    <div>
-      {category && shops ? (
-        <>
-          <LayoutShop
-            category={category}
-            shops={tagId ? filterShops(shops) : shops}
-            setShops={setShops}
-          />
-        </>
+    <>
+      {value ? (
+        <LayoutShop
+          category={value.category}
+          shops={tagId ? filterShops(value.shops) : value.shops}
+          setShops={setShops}
+          setCategory={setCategory}
+        />
       ) : (
-        <>
-          <Spinner />
-        </>
+        <Spinner />
       )}
-    </div>
+    </>
   )
 }
 

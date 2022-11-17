@@ -5,14 +5,15 @@ import {
   BreadcrumbLink,
   Button,
   Heading,
-  Link,
   useDisclosure,
 } from '@chakra-ui/react'
 import { css } from '@emotion/react'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { CategoriesView } from '@/components/categories/CategoriesView'
 import { CategoryModal } from '@/components/categories/Modal'
 import { Container } from '@/components/utils/Container'
+import { NextLink } from '@/components/utils/NextLink'
 import { Spacer } from '@/components/utils/Spacer'
 import { useDevice } from '@/hooks/use-device'
 import { createCategory, deleteCategory } from '@/lib/api/category'
@@ -77,25 +78,37 @@ export const LayoutCategories: React.FC<Props> = ({
         color={'blackAlpha.900'}
       >
         <BreadcrumbItem>
-          <BreadcrumbLink as={Link} href={`/group`}>
-            グループ一覧
-          </BreadcrumbLink>
+          <NextLink href={`/group`}>グループ一覧</NextLink>
         </BreadcrumbItem>
 
         <BreadcrumbItem>
-          <BreadcrumbLink>グループ詳細</BreadcrumbLink>
+          <BreadcrumbLink cursor="initial">グループ詳細</BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
       <Spacer size={isMobile ? 15 : 30} />
-      <div css={headingWrapper}>
+      <div css={headingWrapper} data-view-mobile={isMobile}>
         <Heading size={isMobile ? 'xl' : '2xl'}>カテゴリー一覧</Heading>
         <div css={buttonWrapper}>
-          <Button variant="solid" colorScheme="teal" onClick={onOpen}>
+          <Link href={`/group/${groupId}/shops`}>
+            <Button
+              size={isMobile ? 'sm' : 'md'}
+              variant="solid"
+              colorScheme="teal"
+            >
+              ショップ一覧へ
+            </Button>
+          </Link>
+          <Button
+            size={isMobile ? 'sm' : 'md'}
+            variant="solid"
+            colorScheme="teal"
+            onClick={onOpen}
+          >
             追加する
           </Button>
         </div>
       </div>
-      <Spacer size={40} />
+      <Spacer size={isMobile ? 20 : 40} />
       <CategoriesView categories={categories} handleDelete={handleDelete} />
 
       <CategoryModal
@@ -111,6 +124,12 @@ export const LayoutCategories: React.FC<Props> = ({
 }
 
 const headingWrapper = css`
+  &[data-view-mobile='true'] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
   display: flex;
   align-items: center;
   justify-content: space-between;

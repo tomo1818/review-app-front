@@ -1,8 +1,10 @@
 import { Box, Heading, Container, Text, Button, Stack } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import Link from 'next/link'
+import { useDevice } from '@/hooks/use-device'
 
 const Home: NextPage = () => {
+  const { isMobile } = useDevice()
   return (
     <Container maxW={'3xl'}>
       <Stack
@@ -42,7 +44,11 @@ const Home: NextPage = () => {
             利用を開始する
           </Button>
           <Link href="/signin">
-            <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
+            <Button
+              variant={'link'}
+              colorScheme={'blue'}
+              size={isMobile ? 'sm' : 'md'}
+            >
               ログインはこちら
             </Button>
           </Link>

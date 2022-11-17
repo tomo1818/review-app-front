@@ -13,14 +13,17 @@ import { css } from '@emotion/react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { AddUserModal } from './AddUserModal'
+import { useDevice } from '@/hooks/use-device'
 import { addUserToGroup, deleteUserFromGroup } from '@/lib/api/userGroup'
 import { Group } from '@/types/group'
+import { User } from '@/types/user'
 
 type Props = {
   groups: Group[]
   setGroups: (value: Group[]) => void
   handleDelete: (id: number) => void
   onOpen: (name: string, id: number) => void
+  user: User
 }
 
 export const GroupsView: React.FC<Props> = ({
@@ -28,9 +31,11 @@ export const GroupsView: React.FC<Props> = ({
   setGroups,
   handleDelete,
   onOpen,
+  user,
 }) => {
   const { isOpen, onOpen: onAddUserModalOpen, onClose } = useDisclosure()
   const [group, setGroup] = useState<Group>()
+  const { isMobile } = useDevice()
 
   const handleOpen = (value: Group) => {
     setGroup(value)
@@ -52,6 +57,7 @@ export const GroupsView: React.FC<Props> = ({
   const deleteUser = async (groupId: number, userId: number) => {
     try {
       const res = await deleteUserFromGroup(groupId, userId)
+      console.log(res.data)
       setGroups(
         groups.map((group) => (group.id === res.data.id ? res.data : group)),
       )
@@ -71,12 +77,17 @@ export const GroupsView: React.FC<Props> = ({
       <div css={wrapper}>
         {groups.map((group, index) => (
           <div css={content} key={index}>
-            <Text color="blackAlpha.900" size="md" fontWeight="bold">
+            <Text
+              color="blackAlpha.900"
+              size={isMobile ? 'sm' : 'md'}
+              fontWeight="bold"
+            >
               {group.name}
             </Text>
             <div css={linkContents}>
               <Menu>
                 <MenuButton
+                  size={isMobile ? 'sm' : 'md'}
                   as={IconButton}
                   aria-label="Options"
                   icon={<SettingsIcon />}
@@ -91,14 +102,16 @@ export const GroupsView: React.FC<Props> = ({
                   <MenuItem onClick={() => handleOpen(group)}>
                     ユーザーを追加する
                   </MenuItem>
-                  <MenuItem onClick={() => handleDelete(group.id)}>
-                    削除する
-                  </MenuItem>
+                  {user.id === group.ownerId && (
+                    <MenuItem onClick={() => handleDelete(group.id)}>
+                      削除する
+                    </MenuItem>
+                  )}
                 </MenuList>
               </Menu>
-              <Button>
-                <Link href={`/group/${group.id}`}>詳細を見る</Link>
-              </Button>
+              <Link href={`/group/${group.id}`}>
+                <Button size={isMobile ? 'sm' : 'md'}>詳細を見る</Button>
+              </Link>
             </div>
           </div>
         ))}

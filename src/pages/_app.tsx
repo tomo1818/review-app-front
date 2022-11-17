@@ -2,6 +2,7 @@ import 'ress'
 import { ChakraProvider } from '@chakra-ui/react'
 import { css, Global } from '@emotion/react'
 import type { AppProps } from 'next/app'
+import React from 'react'
 import { RecoilRoot } from 'recoil'
 import { Header } from '@/components/layout/Header'
 import { AuthProvider } from '@/context/AuthContext'
@@ -10,11 +11,13 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider>
       <RecoilRoot>
-        <AuthProvider>
-          <Global styles={globalStyle} />
-          <Header />
-          <Component {...pageProps} />
-        </AuthProvider>
+        <React.Suspense fallback={<div>Loading...</div>}>
+          <AuthProvider>
+            <Global styles={globalStyle} />
+            <Header />
+            <Component {...pageProps} />
+          </AuthProvider>
+        </React.Suspense>
       </RecoilRoot>
     </ChakraProvider>
   )
@@ -33,6 +36,7 @@ const globalStyle = css`
   }
 
   body {
+    min-height: 100vh;
     background-color: var(--color-white);
     color: var(--color-black);
   }

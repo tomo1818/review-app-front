@@ -1,7 +1,8 @@
+import { AxiosPromise } from 'axios'
 import Cookies from 'js-cookie'
 import client from './client'
 import { HeadersItem } from '@/types/auth'
-import { GroupParams } from '@/types/group'
+import { Group, GroupParams } from '@/types/group'
 
 // 一覧取得
 export const getGroups = () => {
@@ -9,7 +10,7 @@ export const getGroups = () => {
 }
 
 // グループ取得
-export const getGroup = (id: number) => {
+export const getGroup = (id: number): AxiosPromise<Group> => {
   return client.get(`/groups/${id}`)
 }
 
