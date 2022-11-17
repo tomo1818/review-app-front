@@ -8,6 +8,9 @@ export const pagesPath = {
         $url: (url?: { hash?: string }) => ({ pathname: '/group/[id]/[categoryId]' as const, query: { id, categoryId }, hash: url?.hash })
       }),
       "shops": {
+        _shopId: (shopId: string | number) => ({
+          $url: (url?: { hash?: string }) => ({ pathname: '/group/[id]/shops/[shopId]' as const, query: { id, shopId }, hash: url?.hash })
+        }),
         $url: (url?: { hash?: string }) => ({ pathname: '/group/[id]/shops' as const, query: { id }, hash: url?.hash })
       },
       $url: (url?: { hash?: string }) => ({ pathname: '/group/[id]' as const, query: { id }, hash: url?.hash })
