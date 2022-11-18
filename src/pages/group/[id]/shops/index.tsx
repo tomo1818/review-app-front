@@ -79,12 +79,13 @@ const Shops: NextPage<Props> = ({ groupId }) => {
       })
     }
     return value.shops.filter((shop) => {
-      let flag = false
+      let tagFlag = false
+      let categoryFlag = false
       shop.tags.forEach((tag) => {
-        if (filteredTags.indexOf(tag.id) !== -1) flag = true
+        if (filteredTags.indexOf(tag.id) !== -1) tagFlag = true
       })
-      if (filteredCategories.indexOf(shop.categoryId) != -1) flag = true
-      return flag
+      if (filteredCategories.indexOf(shop.categoryId) != -1) categoryFlag = true
+      return tagFlag && categoryFlag
     })
   }, [filteredCategories, filteredTags, value])
 
