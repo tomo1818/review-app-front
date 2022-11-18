@@ -86,6 +86,7 @@ const CategoryDetailPage: NextPage<Props> = ({
     <>
       {value ? (
         <LayoutShop
+          groupId={groupId}
           category={value.category}
           shops={tagId ? filterShops(value.shops) : value.shops}
           setShops={setShops}

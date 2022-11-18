@@ -33,6 +33,7 @@ import { Shop, ShopParams } from '@/types/shop'
 import { Tag as TagType } from '@/types/tag'
 
 type Props = {
+  groupId: string
   category?: Category
   categories?: Category[]
   tags?: TagType[]
@@ -46,6 +47,7 @@ type Props = {
 }
 
 export const LayoutShop: React.FC<Props> = ({
+  groupId,
   category,
   shops,
   setShops,
@@ -149,9 +151,17 @@ export const LayoutShop: React.FC<Props> = ({
             </BreadcrumbItem>
           </>
         ) : (
-          <BreadcrumbItem>
-            <BreadcrumbLink cursor="initial">全て</BreadcrumbLink>
-          </BreadcrumbItem>
+          <>
+            <BreadcrumbItem>
+              <Link href={`/group/${groupId}`}>カテゴリー一覧</Link>
+            </BreadcrumbItem>
+
+            <ChevronRightIcon color="gray.500" margin="0px 4px" />
+
+            <BreadcrumbItem>
+              <BreadcrumbLink cursor="initial">全て</BreadcrumbLink>
+            </BreadcrumbItem>
+          </>
         )}
       </Breadcrumb>
       <Spacer size={isMobile ? 15 : 30} />
