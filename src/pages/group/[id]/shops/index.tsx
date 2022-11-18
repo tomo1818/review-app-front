@@ -119,6 +119,7 @@ const Shops: NextPage<Props> = ({ groupId }) => {
     <>
       {value ? (
         <LayoutShop
+          groupId={groupId}
           shops={filteredShops()}
           setShops={setShops}
           tags={tags}
