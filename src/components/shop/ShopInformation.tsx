@@ -1,7 +1,6 @@
 import { Heading, Tag, TagLabel, TagLeftIcon, Text } from '@chakra-ui/react'
 import { css } from '@emotion/react'
 import Image from 'next/image'
-import Link from 'next/link'
 import { BiCategoryAlt } from 'react-icons/bi'
 import { LinkText } from '../utils/LinkText'
 import { Spacer } from '../utils/Spacer'
@@ -46,14 +45,14 @@ export const ShopInformation: React.FC<Props> = ({
             {name}
           </Heading>
           {url && (
-            <Link href={url} target="_blank" rel="noopener noreferrer">
+            <a href={url} target="_blank" rel="noopener noreferrer">
               <Image
                 src={staticPath.svg.icon_launch_svg}
                 width={20}
                 height={20}
                 alt="リンク先へのアイコン"
               />
-            </Link>
+            </a>
           )}
         </div>
         <Spacer size={isMobile ? 5 : 10} />
@@ -99,6 +98,7 @@ const heading = css`
   a {
     width: 20px;
     height: 20px;
+    cursor: pointer;
   }
 `
 
